@@ -3,7 +3,9 @@ import pprint as pp
 import networkx as nx
 import pickle
 
-with open('pol_id_time_mapping.pkl', 'rb') as f:
+file_type = 'gossicop'
+
+with open(f"./{file_type}/{file_type[:3]}_id_time_mapping.pkl", 'rb') as f:
     maps_timestamps = pickle.load(f)
 
 class SubGraph:
@@ -13,12 +15,12 @@ class SubGraph:
 
 G = nx.Graph()
 
-with open('A.txt') as f:
+with open(f"./{file_type}/A.txt") as f:
     for line in f:
         line = line.strip().split(', ')
         G.add_edge(int(line[0]), int(line[1]))
 
-graphs_labels = np.load("./graph_labels.npy")
+graphs_labels = np.load(f"./{file_type}/graph_labels.npy")
 subgraphs = []
 #print(nx.number_connected_components(G))
 for index, cc in enumerate(nx.connected_components(G)):
@@ -31,10 +33,17 @@ i = 0
 total_r = 0
 max_degree_r = 0
 std_r = 0
+degree_centrality_r = 0
+closeness_centrality_r = 0
+pagerank_r = 0
+
 j = 0
 total_f = 0
 max_degree_f = 0
 std_f = 0
+degree_centrality_f = 0
+closeness_centrality_f = 0
+pagerank_f = 0
 
 for s in subgraphs:
     print("Analyzing graph: " + str(i+j))
@@ -50,15 +59,27 @@ for s in subgraphs:
     d = nx.diameter(s.graph)
     #calculating the max degree
     _, neighbors = max(s.graph.degree, key=lambda x: x[1])
+    #calculating degree centrality
+    dc = np.mean(list(nx.degree_centrality(s.graph).values()))
+    #calculating closeness centrality
+    cc = np.mean(list(nx.closeness_centrality(s.graph).values()))
+    #calculating pagerank
+    pr = np.mean(list(nx.pagerank(s.graph).values()))
     if s.info == 0:
         total_r += d
         max_degree_r += neighbors
         std_r += std
+        degree_centrality_r += dc
+        closeness_centrality_r += cc
+        pagerank_r += pr
         i += 1
     else:
         total_f += d
         max_degree_f += neighbors
         std_f += std
+        degree_centrality_f += dc
+        closeness_centrality_f += cc
+        pagerank_f += pr
         j += 1
 
 print("Average diameter of real graphs: " + str(total_r / i))
@@ -73,3 +94,18 @@ print()
 
 print("Average std of timestamps of real graphs: " + str(std_r / i))
 print("Average std of timestamps of fake graphs: " + str(std_f / j))
+
+print()
+
+print("Average degree centrality of real graphs: " + str(degree_centrality_r / i))
+print("Average degree centrality of fake graphs: " + str(degree_centrality_f / j))
+
+print()
+
+print("Average closeness centrality of real graphs: " + str(closeness_centrality_r / i))
+print("Average closeness centrality of fake graphs: " + str(closeness_centrality_f / j))
+
+print()
+
+print("Average pagerank of real graphs: " + str(pagerank_r / i))
+print("Average pagerank of fake graphs: " + str(pagerank_f / j))
