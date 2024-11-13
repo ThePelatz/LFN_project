@@ -3,7 +3,7 @@ import pprint as pp
 import networkx as nx
 import pickle
 
-file_type = 'gossicop'
+file_type = 'politifact'
 
 with open(f"./{file_type}/{file_type[:3]}_id_time_mapping.pkl", 'rb') as f:
     maps_timestamps = pickle.load(f)

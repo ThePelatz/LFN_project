@@ -10,7 +10,6 @@ politifact
 gossicop
 
 
-*.pdf
 *.aux
 *.fdb_latexmk
 *.fls
