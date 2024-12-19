@@ -3,7 +3,19 @@ import pprint as pp
 import networkx as nx
 import pickle
 
-file_type = 'politifact'
+file_type = 'gossicop'
+all_data = []
+
+def dump_data(data: list[list]):
+    file_name = f"./{file_type}.csv"
+    with open(file_name, "w") as file:
+        for graph in data:
+            s = ""
+            for value in graph:
+                s += str(value) + ", "
+            s = s[:-2] + "\n"
+            #print(s)
+            file.write(s)
 
 with open(f"./{file_type}/{file_type[:3]}_id_time_mapping.pkl", 'rb') as f:
     maps_timestamps = pickle.load(f)
@@ -46,7 +58,7 @@ closeness_centrality_f = 0
 pagerank_f = 0
 
 for s in subgraphs:
-    print("Analyzing graph: " + str(i+j))
+    print("\rAnalyzing graph: " + str(i+j))
     #calculating the std of timestamps
     timestamps = []
     for node in s.graph.nodes:
@@ -65,6 +77,9 @@ for s in subgraphs:
     cc = np.mean(list(nx.closeness_centrality(s.graph).values()))
     #calculating pagerank
     pr = np.mean(list(nx.pagerank(s.graph).values()))
+    
+    all_data.append([d, neighbors, std, dc, cc, pr, s.info])
+    
     if s.info == 0:
         total_r += d
         max_degree_r += neighbors
@@ -109,3 +124,5 @@ print()
 
 print("Average pagerank of real graphs: " + str(pagerank_r / i))
 print("Average pagerank of fake graphs: " + str(pagerank_f / j))
+
+dump_data(all_data)
