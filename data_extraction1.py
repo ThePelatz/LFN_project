@@ -26,7 +26,7 @@ with open(f"./{file_type}/A_train.txt") as f:
 graphs_labels = np.load(f"./{file_type}/graph_labels_train.npy")
 
 
-with open(f"./{file_type}/pol_id_twitter_mapping.pkl", "rb") as f:
+with open(f"./{file_type}/{file_type[:3]}_id_twitter_mapping.pkl", "rb") as f:
     user_mapping = pickle.load(f)
 
 

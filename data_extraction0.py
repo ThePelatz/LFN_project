@@ -1,27 +1,17 @@
+# GOAL OF THE PROGRAM
+# Prepare the datasets to be used for ranking the users. 
+# The dataset A.txt is split into A_train.txt (the dataset that will be 
+# used to create the user ranking) and A_test.txt. The split is 80/20, 
+# taken randomly but maintaining the proportion of true and false news.
+# The data is divided into multiple files, so during the process of creating 
+# the two datasets, it is necessary to consistently modify other files(e.g. graph_labels.npy) as well.
+
 import networkx as nx
 import numpy as np
 import random
 
 def split_graph_dataset(input_file, train_file, test_file, labels_file, node_ids_file, news_list_file, train_labels_file, test_labels_file, train_node_ids_file, test_node_ids_file, train_news_list_file, test_news_list_file, split_ratio=0.8):
-    """
-    Splits a graph dataset into training and testing datasets, preserving the original format,
-    while maintaining balance between true (label 0) and false (label 1) news.
 
-    Parameters:
-        input_file (str): Path to the input file.
-        train_file (str): Path to the training output file.
-        test_file (str): Path to the testing output file.
-        labels_file (str): Path to the labels file.
-        node_ids_file (str): Path to the node IDs file.
-        news_list_file (str): Path to the news list file.
-        train_labels_file (str): Path to the training labels output file.
-        test_labels_file (str): Path to the testing labels output file.
-        train_node_ids_file (str): Path to the training node IDs output file.
-        test_node_ids_file (str): Path to the testing node IDs output file.
-        train_news_list_file (str): Path to the training news list output file.
-        test_news_list_file (str): Path to the testing news list output file.
-        split_ratio (float): Ratio of data to include in the training set (default: 0.8).
-    """
     # Read the dataset
     edges = []
     with open(input_file, 'r') as f:
@@ -122,12 +112,12 @@ train_file = f"./{file_type}/A_train.txt"
 test_file = f"./{file_type}/A_test.txt"
 labels_file = f"./{file_type}/graph_labels.npy"
 node_ids_file = f"./{file_type}/node_graph_id.npy"
-news_list_file = f"./{file_type}/pol_news_list.txt"
+news_list_file = f"./{file_type}/{file_type[:3]}_news_list.txt"
 train_labels_file = f"./{file_type}/graph_labels_train.npy"
 test_labels_file = f"./{file_type}/graph_labels_test.npy"
 train_node_ids_file = f"./{file_type}/node_graph_id_train.npy"
 test_node_ids_file = f"./{file_type}/node_graph_id_test.npy"
-train_news_list_file = f"./{file_type}/pol_news_list_train.txt"
-test_news_list_file = f"./{file_type}/pol_news_list_test.txt"
+train_news_list_file = f"./{file_type}/{file_type[:3]}_news_list_train.txt"
+test_news_list_file = f"./{file_type}/{file_type[:3]}_news_list_test.txt"
 
 split_graph_dataset(input_file, train_file, test_file, labels_file, node_ids_file, news_list_file, train_labels_file, test_labels_file, train_node_ids_file, test_node_ids_file, train_news_list_file, test_news_list_file)

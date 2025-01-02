@@ -6,7 +6,7 @@ from collections import defaultdict
 
 file_type = "politifact"
 news_user_graph_file = f"./{file_type}/A_train.txt"
-id_mapping_file = f"./{file_type}/pol_id_twitter_mapping.pkl"
+id_mapping_file = f"./{file_type}/{file_type[:3]}_id_twitter_mapping.pkl"
 news_user_mapping_file = f"./{file_type}/news_user_mapping.csv"
 graph_labels_file = f"./{file_type}/graph_labels_train.npy"
 news_list_file = f"./{file_type}/pol_news_list_train.txt"
@@ -19,7 +19,7 @@ with open(id_mapping_file, 'rb') as f:
 # Load labels from graph_labels.npy
 news_labels = np.load(graph_labels_file)  # 0 = true, 1 = false
 
-# Create a mapping of news_id to index using pol_news_list_train.txt
+# Create a mapping of news_id to index using {file_type[:3]}_news_list_train.txt
 news_id_to_index = {}
 with open(news_list_file, 'r') as news_list:
     for idx, line in enumerate(news_list):

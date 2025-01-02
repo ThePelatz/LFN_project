@@ -10,7 +10,7 @@ import pickle
 # Reading files
 file_type = "politifact"
 ranking_file = f"./{file_type}/USER_RANKING.csv"
-mapping_file = f"./{file_type}/pol_id_twitter_mapping.pkl"
+mapping_file = f"./{file_type}/{file_type[:3]}_id_twitter_mapping.pkl"
 
 def create_ranking_metrics(graph_file, output_file):
 
