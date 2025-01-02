@@ -8,7 +8,7 @@ import networkx as nx
 import pickle
 
 # Reading files
-file_type = "politifact"
+file_type = "gossipcop"
 ranking_file = f"./{file_type}/USER_RANKING.csv"
 mapping_file = f"./{file_type}/{file_type[:3]}_id_twitter_mapping.pkl"
 

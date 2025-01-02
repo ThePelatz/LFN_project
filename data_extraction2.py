@@ -4,12 +4,12 @@ import networkx as nx
 import pickle
 from collections import defaultdict
 
-file_type = "politifact"
+file_type = "gossipcop"
 news_user_graph_file = f"./{file_type}/A_train.txt"
 id_mapping_file = f"./{file_type}/{file_type[:3]}_id_twitter_mapping.pkl"
 news_user_mapping_file = f"./{file_type}/news_user_mapping.csv"
 graph_labels_file = f"./{file_type}/graph_labels_train.npy"
-news_list_file = f"./{file_type}/pol_news_list_train.txt"
+news_list_file = f"./{file_type}/{file_type[:3]}_news_list_train.txt"
 output_file = f"./{file_type}/user_news_statistics_with_centrality.csv"
 
 # Load ID mapping (local to real ID)

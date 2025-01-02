@@ -3,7 +3,7 @@ from sklearn import preprocessing
 from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score, classification_report
 
-file_type = "politifact"
+file_type = "gossipcop"
 
 # Load training dataset
 train_main = pd.read_csv(f"./{file_type}/{file_type}_resized.csv", sep=',', header=None)

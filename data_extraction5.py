@@ -4,7 +4,7 @@ import networkx as nx
 import pickle
 
 # Variable to define the file type
-file_type = "politifact"
+file_type = "gossipcop"
 
 
 # Function to save data to a CSV file

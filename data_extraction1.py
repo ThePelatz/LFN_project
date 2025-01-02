@@ -7,7 +7,7 @@ import networkx as nx
 import pickle
 import csv
 
-file_type = 'politifact'
+file_type = 'gossipcop'
 
 class SubGraph:
     def __init__(self, graph: nx.Graph, info: int):

@@ -3,5 +3,9 @@ politifact/news_user_mapping.csv
 politifact/*_train.*
 politifact/*_test.*
 
+gossipcop/*.csv
+gossipcop/news_user_mapping.csv
+gossipcop/*_train.*
+gossipcop/*_test.*
 __pycache__
 .venv

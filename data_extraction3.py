@@ -5,7 +5,7 @@
 
 import csv
 
-file_type = "politifact"
+file_type = "gossipcop"
 input_file = f"./{file_type}/user_news_statistics_with_centrality.csv"
 output_file = f"./{file_type}/USER_RANKING.csv"
 

@@ -106,7 +106,7 @@ def split_graph_dataset(input_file, train_file, test_file, labels_file, node_ids
         f.write("\n".join(test_news))
 
 # Paths
-file_type = "politifact"
+file_type = "gossipcop"
 input_file = f"./{file_type}/A.txt"
 train_file = f"./{file_type}/A_train.txt"
 test_file = f"./{file_type}/A_test.txt"
