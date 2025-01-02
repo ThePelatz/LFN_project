@@ -1,0 +1,3 @@
+politifact/*.csv
+politifact/*_train.*
+politifact/*_test.*

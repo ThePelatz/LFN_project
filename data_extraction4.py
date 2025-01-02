@@ -17,9 +17,6 @@ def create_ranking_metrics(graph_file, output_file):
     # Load the user ranking file
     user_ranking = pd.read_csv(ranking_file)
 
-    # Filter users with at least 3 shared news
-    filtered_users = user_ranking
-
     # Load the mapping between local and real IDs
     with open(mapping_file, 'rb') as f:
         id_mapping = pickle.load(f)
@@ -46,7 +43,7 @@ def create_ranking_metrics(graph_file, output_file):
                     root = local_to_real_id[node]
         
         # Filter users that are in the filtered ranking
-        valid_users = filtered_users[filtered_users['UserID'].isin(user_ids)]
+        valid_users = user_ranking[user_ranking['UserID'].isin(user_ids)]
 
         # Extract centrality values from the user ranking data
         pagerank_values = valid_users['PageRankCentrality'].values
@@ -58,13 +55,13 @@ def create_ranking_metrics(graph_file, output_file):
         avg_degree = degree_values.mean() if len(degree_values) > 0 else 0
         avg_closeness = closeness_values.mean() if len(closeness_values) > 0 else 0
         
-        # Calculate other metrics
+        # Calculate other metrics (considering reliable users as users with score >1.5)
         if valid_users.empty:
-            avg_ranking = filtered_users['UserScore'].mean()
-            reliable_users_percentage = len(filtered_users[filtered_users['UserScore'] >= 1.5 ]) / len(filtered_users)
-            min_user_score = filtered_users['UserScore'].min()
-            max_user_score = filtered_users['UserScore'].max()
-            weighted_score = (filtered_users['UserScore'] / filtered_users['TotalNews']).sum()
+            avg_ranking = user_ranking['UserScore'].mean()
+            reliable_users_percentage = len(user_ranking[user_ranking['UserScore'] >= 1.5 ]) / len(user_ranking)
+            min_user_score = user_ranking['UserScore'].min()
+            max_user_score = user_ranking['UserScore'].max()
+            weighted_score = (user_ranking['UserScore'] / user_ranking['TotalNews']).sum()
         else:
             avg_ranking = valid_users['UserScore'].mean()
             reliable_users_percentage = len(valid_users[valid_users['UserScore'] >= 1.5 ]) / len(valid_users)

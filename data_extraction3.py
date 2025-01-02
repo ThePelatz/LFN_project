@@ -54,19 +54,19 @@ for user in users_data:
             user["UserScore"] = single_news_false_score
         continue
 
-    # Calculate FR (False Retweets Normalized)
+    # Calculate FR (False Retweets)
     FR = user["FalseNews"] / user["TotalNews"] if user["TotalNews"] > 0 else 0
     
-    # Calculate TFR (True to False Ratio Normalized)
+    # Calculate TFR (True to False Ratio)
     TFR = user["TrueNews"] / user["FalseNews"] if user["FalseNews"] > 0 else user["TrueNews"]
     
-    # Calculate NP (Normalized PageRank)
+    # Calculate NP (PageRank)
     NP = (user["PageRankCentrality"] - min_pr) / (max_pr - min_pr) if max_pr != min_pr else 0
     
-    # Calculate DC (Normalized Degree Centrality)
+    # Calculate DC (Degree Centrality)
     DC = (user["DegreeCentrality"] - min_dc) / (max_dc - min_dc) if max_dc != min_dc else 0
     
-    # Calculate CC (Normalized Closeness Centrality)
+    # Calculate CC (Closeness Centrality)
     CC = (user["ClosenessCentrality"] - min_cc) / (max_cc - min_cc) if max_cc != min_cc else 0
     
     # Penalize users with low TotalNews
