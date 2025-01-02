@@ -1,4 +1,5 @@
 politifact/*.csv
+politifact/news_user_mapping.csv
 politifact/*_train.*
 politifact/*_test.*
 
