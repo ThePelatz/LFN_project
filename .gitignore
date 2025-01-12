@@ -9,3 +9,10 @@ gossipcop/*_train.*
 gossipcop/*_test.*
 __pycache__
 .venv
+
+*.aux
+*.log
+*.fls
+*.fdb_latexmk
+*.out
+*.dvi
