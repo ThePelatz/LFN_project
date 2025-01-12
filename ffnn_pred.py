@@ -8,7 +8,7 @@ from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.callbacks import EarlyStopping
 from sklearn.metrics import classification_report
 
-file_type = "politifact"
+file_type = "gossipcop"
 
 # Load the data
 df = pd.read_csv(f"{file_type}.csv", sep=',', header=None)
