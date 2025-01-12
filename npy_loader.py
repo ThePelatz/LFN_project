@@ -3,7 +3,7 @@ import pprint as pp
 import networkx as nx
 import pickle
 
-file_type = 'gossicop'
+file_type = 'gossipcop'
 all_data = []
 
 def dump_data(data: list[list]):

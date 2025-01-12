@@ -1,0 +1,10 @@
+SVM Classification Report without Ranking Data:
+Kernel: Polynomial (C=10, degree=3)
+              precision    recall  f1-score   support
+
+         0.0       0.88      0.47      0.61        32
+         1.0       0.64      0.94      0.76        32
+
+    accuracy                           0.70        64
+   macro avg       0.76      0.70      0.69        64
+weighted avg       0.76      0.70      0.69        64

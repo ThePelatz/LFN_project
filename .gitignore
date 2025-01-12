@@ -1,18 +1,11 @@
-*.txt
-*.npy
-*.npz
-*.pkl
+politifact/*.csv
+politifact/news_user_mapping.csv
+politifact/*_train.*
+politifact/*_test.*
 
+gossipcop/*.csv
+gossipcop/news_user_mapping.csv
+gossipcop/*_train.*
+gossipcop/*_test.*
 __pycache__
-
-politifact
-
-gossicop
-
-
-*.aux
-*.fdb_latexmk
-*.fls
-*.log
-*.out
-*.dvi
+.venv

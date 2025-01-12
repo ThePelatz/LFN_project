@@ -6,7 +6,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report, accuracy_score
 from sklearn.model_selection import GridSearchCV
 
-file_type = "politifact"
+file_type = "gossipcop"
 
 # Load the data
 df = pd.read_csv(f"{file_type}.csv", sep=',', header=None)
