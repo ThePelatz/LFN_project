@@ -9,6 +9,35 @@
 \usepackage{amsmath}   % For mathematical expressions
 \usepackage{hyperref}  % For hyperlinks
 \usepackage{enumitem}  % For custom lists
+\usepackage{listings}
+
+\usepackage{xcolor}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
 
 % Title information
 \title{Predicting news truthfulness through graph-based retweet patterns.}
@@ -110,7 +139,7 @@ The models we want to try are the following:
 \end{itemize}
 
 We will make comparisons to better understand which model fits this problem best, based on which one achieves better accuracy and also the time it will take to train it.
-\\\textbf{Libraries}: Networkx\cite{networkx} (for Graph analysis), Scikit-Learn (for SVM and RF models), Pytorch (for FFNN model)
+\\\textbf{Libraries}: Networkx\cite{networkx} (for Graph analysis), Scikit-Learn (for SVM and RF models), Tensorflow (for FFNN model)
 \\\textbf{Evaluation metrics of the model}: Accuracy, Precision, Recall and F1-Score
 \\\textbf{Machine for experiments}: 
 \begin{itemize}
@@ -118,6 +147,54 @@ We will make comparisons to better understand which model fits this problem best
 	\item AMD Ryzen 5 3500U (8-cores), 8GB DDR4, Windows 11 or Ubunutu 20.04
 	\item AMD Ryzen 5 4500 (8-cores), Radeon RX 6600, 16GB DDR4, Windows 11 or Ubuntu 20.04
 \end{itemize}
+
+\newpage
+
+\section*{Development}
+
+\subsection*{Extracting informations from the dataset}
+
+The first part of the project involves extracting the data from the datatset. As shown previously the dataset is composed of many connected components, each representing a news (related to gossip or politics). It has been decided, during the development, to consider only few features that could be relevant to the objective of the project.
+Those features are:\\\\
+\textbf{Diameter}: provides insight into the maximum extent of information spread. The bigger the diameter, the deeper (given that the structure of the graph is a tree) the news is spreaded among the users.\\
+\textbf{Maximum degree}: identifies the node with the highest number of connections. In the case of fake news, such nodes could be targeted for spreading misinformation widely.\\
+\textbf{Degree centrality}: the number of direct connections a node has. Nodes with high degree centrality are crucial in the immediate dissemination of news.\\
+\textbf{Closeness centrality}: how quickly information can spread from a given node to all other nodes in the network. High closeness centrality suggests that a node is well-positioned to efficiently spread news.\\
+\textbf{PageRank}: rank of nodes in a graph based on their importance. High PageRank nodes are influential and could be key disseminators of real or fake news.\\
+\textbf{Average Standard Deviation of Retweet Timestamps}: consistency or burstiness of retweet activity over time. A small average standard deviation means that the news could be spreaded in a small amount of time since it has been tweeted for the first time.\\
+
+Using networkx as the library for analyzing the graphs, extracting these information was actually easy. With all the features we then exported them into ".csv" files and ultimately we calculated all the average values separately for news labeled real and fake that are going to be used later in a system of prediction based on score.
+
+\begin{lstlisting}[language=Python]
+    import networkx as nx
+
+    #calculating std of the timestamps
+    std = np.std(np.array(timestamps))
+    #calculating the diameter
+    d = nx.diameter(s.graph)
+    #calculating the max degree
+    _, neighbors = max(s.graph.degree, key=lambda x: x[1])
+    #calculating degree centrality
+    dc = np.mean(list(nx.degree_centrality(s.graph).values()))
+    #calculating closeness centrality
+    cc = np.mean(list(nx.closeness_centrality(s.graph).values()))
+    #calculating pagerank
+    pr = np.mean(list(nx.pagerank(s.graph).values()))
+
+	#function for exporting data into .csv
+    def dump_data(data: list[list]):
+    file_name = f"./{file_type}.csv"
+    with open(file_name, "w") as file:
+        for graph in data:
+            s = ""
+            for value in graph:
+                s += str(value) + ", "
+            s = s[:-2] + "\n"
+            #print(s)
+            file.write(s)
+\end{lstlisting}
+
+
 
 \newpage
 
