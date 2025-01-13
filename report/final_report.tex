@@ -10,7 +10,7 @@
 \usepackage{hyperref}  % For hyperlinks
 \usepackage{enumitem}  % For custom lists
 \usepackage{listings}
-
+\usepackage{subfigure}
 \usepackage{xcolor}
 
 \definecolor{codegreen}{rgb}{0,0.6,0}
@@ -139,7 +139,7 @@ The models we want to try are the following:
 \end{itemize}
 
 We will make comparisons to better understand which model fits this problem best, based on which one achieves better accuracy and also the time it will take to train it.
-\\\textbf{Libraries}: Networkx\cite{networkx} (for Graph analysis), Scikit-Learn (for SVM and RF models), Tensorflow (for FFNN model)
+\\\textbf{Libraries}: Networkx\cite{networkx} (for Graph analysis), Scikit-Learn\cite{scikit} (for SVM and RF models), Tensorflow\cite{tensor} (for FFNN model)
 \\\textbf{Evaluation metrics of the model}: Accuracy, Precision, Recall and F1-Score
 \\\textbf{Machine for experiments}: 
 \begin{itemize}
@@ -163,7 +163,7 @@ Those features are:\\\\
 \textbf{PageRank}: rank of nodes in a graph based on their importance. High PageRank nodes are influential and could be key disseminators of real or fake news.\\
 \textbf{Average Standard Deviation of Retweet Timestamps}: consistency or burstiness of retweet activity over time. A small average standard deviation means that the news could be spreaded in a small amount of time since it has been tweeted for the first time.\\
 
-Using networkx as the library for analyzing the graphs, extracting these information was actually easy. With all the features we then exported them into ".csv" files and ultimately we calculated all the average values separately for news labeled real and fake that are going to be used later in a system of prediction based on score.
+Using networkx\cite{networkx} as the library for analyzing the graphs, extracting these information was actually easy. With all the features we then exported them into ".csv" files and ultimately we calculated all the average values separately for news labeled real and fake that are going to be used later in a system of prediction based on score.
 
 \begin{lstlisting}[language=Python]
     import networkx as nx
@@ -180,21 +180,122 @@ Using networkx as the library for analyzing the graphs, extracting these informa
     cc = np.mean(list(nx.closeness_centrality(s.graph).values()))
     #calculating pagerank
     pr = np.mean(list(nx.pagerank(s.graph).values()))
-
-	#function for exporting data into .csv
-    def dump_data(data: list[list]):
-    file_name = f"./{file_type}.csv"
-    with open(file_name, "w") as file:
-        for graph in data:
-            s = ""
-            for value in graph:
-                s += str(value) + ", "
-            s = s[:-2] + "\n"
-            #print(s)
-            file.write(s)
 \end{lstlisting}
 
+\newpage
 
+\subsection*{Prediction system}
+
+Once the features are extracted we have created a system based on score that is capable of predicting in a probabilistic way if a news is real or fake. This system gets some graphs data as input
+and determines how much it deviates from the averages calculated with previous algorithms giving a final score from 0 to 12 (12 being the highest confidence).
+
+\begin{lstlisting}[language=Python]
+	def confidence_scoring(value, avg_r, avg_f):
+        # Compute the difference
+        diff_r = abs(avg_r - value)    #avg of real sub-graph - new value
+        diff_f = abs(avg_f - value)    #avg of fake sub-graph - new value
+        inside = (value<avg_r and value>avg_f) or (value<avg_f and value>avg_r) #The value is between the 2 avg
+        #Closest one
+        closer = 0              # 0 = Equal
+        if diff_r < diff_f:
+            closer = 1          # 1 = Real
+        elif diff_r > diff_f:
+            closer = 2          # 2 = Fake
+        #Confidence score
+        score = 0                                       #No guess
+        if closer == 1:                                 #Real
+            if 2*diff_r < diff_f or not inside:
+                score = 2                               #Strong guess
+            else:
+                score = 1                               #Weak guess
+        elif closer == 2:                               #Fake
+            if 2*diff_f < diff_r or not inside:
+                score = -2                              #Strong guess
+            else:
+                score = -1                              #Weak guess
+        return score
+\end{lstlisting}
+
+\begin{center}
+	\includegraphics[width=0.8\textwidth]{graph}
+\end{center}
+
+The image above is just an example on how it can display the prediction and its accuracy. It represent
+a conﬁdence score on how sure we are about a news label. From what we can see, there is a correlation between the data extracted from
+the graphs and their actual label. This is what we expected from the beginning so this will be important to develop a machine learning model which is able to predict the truthfulness of a news with a sufficiently high accuracy.
+
+\newpage
+
+\subsection*{Machine learning models and User reliability ranking}
+
+In the final part of the project some ML models have been developed and tested onto the features retrieved before. By using the dataset we were able to map the nodes ID to the user ID and determine the number of real and fake news retweeted by the users. We then calculated the user score with this equation:
+
+\begin{center}
+	UserScore = US \\
+	Normalized number of false retweets = FR \\
+	Normalized true to false ratio = TFR \\
+	Normalized pagerank of node = NP \\
+	Normalized degree centrality of node = NP \\
+	Normalized closeness centrality of node = NP \\
+\end{center}
+
+\begin{equation}
+	US = 0.4 \times FR + 0.3 \times TFR + 0.2 \times NP + 0.1 \times DC + 0.1 \times CC
+\end{equation}
+
+\begin{lstlisting}[language=Python]
+	# Calculate the score for each user
+    # Calculate FR (False Retweets)
+    FR = user["FalseNews"] / user["TotalNews"] 
+        if user["TotalNews"] > 0 else 0
+    # Calculate TFR (True to False Ratio)
+    TFR = user["TrueNews"] / user["FalseNews"] 
+        if user["FalseNews"] > 0 else user["TrueNews"]
+    # Calculate NP (PageRank)
+    NP = (user["PageRankCentrality"] - min_pr) / (max_pr - min_pr) 
+        if max_pr != min_pr else 0
+    # Calculate DC (Degree Centrality)
+    DC = (user["DegreeCentrality"] - min_dc) / (max_dc - min_dc) 
+        if max_dc != min_dc else 0
+    # Calculate CC (Closeness Centrality)
+    CC = (user["ClosenessCentrality"] - min_cc) / (max_cc - min_cc) 
+        if max_cc != min_cc else 0
+    # Penalize users with low TotalNews
+    penalty = alpha / user["TotalNews"] if user["TotalNews"] > 0 else 0
+    # Calculate UserScore
+    user["UserScore"] = 0.4 * FR + 0.3 * TFR + 0.1 * NP + 0.1 * DC + 0.1 * CC
+\end{lstlisting}
+
+This user ranking will be useful later to train some models in order to increase the general accuracy. As stated before we are going to implement three type of ML models: Support Vector Machine, Feed Forward Neural Network and Random Forest of which all have been tuned with a validation set to have the best parameters.
+The final question is: how well does these model perform on the features extracted before?
+
+\newpage
+
+\subsection*{Results}
+
+\begin{figure}[h]
+    \centering
+    \subfigure[Random Forest Results]{
+        \includegraphics[width=0.4\textwidth]{rf_results}
+    }
+    \subfigure[Feed Forward Neural Network Results]{
+        \includegraphics[width=0.4\textwidth]{ffnn_results}
+    }
+    \subfigure[Support Vector Machine Results]{
+        \includegraphics[width=0.4\textwidth]{svm_no_ranking_result}
+    }
+\end{figure}
+
+The Support Vector Machine results were promising even though the model is very simple, requires few resources and the training is not time consuming. We then tried to concatenate the User ranking data to the features of the news graph and feed them into another SVM model with the same parameters as the one used in figure (a). The results were impressive:
+
+\begin{figure}[h]
+    \centering
+    \subfigure[Support Vector Machine with ranking Results]{
+        \includegraphics[width=0.6\textwidth]{svm_ranking_result.png}
+    }
+\end{figure}
+
+\section*{Issues encountered}
 
 \newpage
 
@@ -203,6 +304,8 @@ Using networkx as the library for analyzing the graphs, extracting these informa
 	\bibitem{dataset} Dataset: \url{https://github.com/safe-graph/GNN-FakeNews/tree/main},\\\url{https://drive.google.com/drive/folders/1OslTX91kLEYIi2WBnwuFtXsVz5SS_XeR?usp=sharing}
 	\bibitem{data_paper} Kai Shu, Deepak Mahudeswaran, Suhang Wang, Dongwon Lee and Huan Liu\\"FakeNewsNet: A Data Repository with News Content, Social Context and Spatiotemporal Information for Studying Fake News on Social Media",\\ \url{https://arxiv.org/pdf/1809.01286}, 2019
 	\bibitem{networkx} NetworkX library: \url{https://networkx.org/documentation/stable/}
+	\bibitem{scikit} Scikit-learn library: \url{https://scikit-learn.org/stable/api/index.html}
+	\bibitem{tensor} Tensorflow library: \url{https://www.tensorflow.org/api_docs/python/tf}
 \end{thebibliography}
 
 \newpage
