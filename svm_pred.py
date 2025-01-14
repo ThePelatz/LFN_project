@@ -5,7 +5,7 @@ from sklearn.svm import SVC
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import accuracy_score, classification_report
 
-file_type = "politifact"
+file_type = "gossipcop"
 
 # Load the data
 df = pd.read_csv(f"{file_type}.csv", sep=',', header=None)

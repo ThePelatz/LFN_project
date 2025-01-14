@@ -109,24 +109,7 @@ The algorithms that we are going to use are important for:
 	\end{center}
 \end{wrapfigure}
 One of the goal is to visualize wether new data involving a news fits better into the "Real news" or "Fake news" category. This can be achieve displaying a bar graph representing the features studied previously.\\
-The final step is to create a ranking of users based on their reliability and to generate features for the data using this ranking. To do this, the following factors will be considered:
-\begin{itemize}
-	\setlength\itemsep{-0.3em}
-	\item Number of retweets of false news
-	\item Percentage of retweets of true vs. false news
-	\item Betweenness centrality of the user in the graph
-	\item Pagerank of the user in the graph
-\end{itemize}
-
-For large datasets computing the ranking for ALL users might be computationally expensive. Therefore, in this case, users with good centrality measures will have priority. 
-The features of the news obtained from this ranking are as follows:
-\begin{itemize}
-	\setlength\itemsep{-0.3em}
-	\item Average Ranking Positions of users who retweeted the news
-	\item Percentage of reliable users (e.g. percentage of users in the top 20)
-	\item Minimum and maximum position
-	\item Weighted score based on reliability
-\end{itemize}
+The final step is to create a ranking of users based on their reliability and to generate features for the data using this ranking. More details about it will be given in the following pages.
 
 \subsection*{Machine learning models}
 
@@ -147,8 +130,6 @@ We will make comparisons to better understand which model fits this problem best
 	\item AMD Ryzen 5 3500U (8-cores), 8GB DDR4, Windows 11 or Ubunutu 20.04
 	\item AMD Ryzen 5 4500 (8-cores), Radeon RX 6600, 16GB DDR4, Windows 11 or Ubuntu 20.04
 \end{itemize}
-
-\newpage
 
 \section*{Development}
 
@@ -182,10 +163,8 @@ Using networkx\cite{networkx} as the library for analyzing the graphs, extractin
     pr = np.mean(list(nx.pagerank(s.graph).values()))
 \end{lstlisting}
 
-\newpage
 
-\subsection*{Prediction system}
-
+\subsection*{\\Prediction system}
 Once the features are extracted we have created a system based on score that is capable of predicting in a probabilistic way if a news is real or fake. This system gets some graphs data as input
 and determines how much it deviates from the averages calculated with previous algorithms giving a final score from 0 to 12 (12 being the highest confidence).
 
@@ -224,78 +203,146 @@ The image above is just an example on how it can display the prediction and its 
 a conﬁdence score on how sure we are about a news label. From what we can see, there is a correlation between the data extracted from
 the graphs and their actual label. This is what we expected from the beginning so this will be important to develop a machine learning model which is able to predict the truthfulness of a news with a sufficiently high accuracy.
 
-\newpage
+\subsection*{\\ \\User reliability ranking}
+To enhance the prediction accuracy for our news dataset, we extended our feature set by incorporating user-related information in addition to the tree structure representing the news. Specifically, we developed a \textit{User Reliability Ranking} system, which captures key characteristics of users who shared the news.
 
-\subsection*{Machine learning models and User reliability ranking}
+\subsection*{Methodology}
 
-In the final part of the project some ML models have been developed and tested onto the features retrieved before. By using the dataset we were able to map the nodes ID to the user ID and determine the number of real and fake news retweeted by the users. We then calculated the user score with this equation:
+The dataset was split into two parts: \textbf{Training set (80\%)} used to compute user-related features. \textbf{Test set (20\%)} used to measure the performance of the model using information about users taken from the training set.
+
+\subsection*{Feature Extraction for Individual Users}
+For each user in the training set, we calculated the following features, considering that a user who shares multiple news items will appear in several news trees:
+\begin{enumerate}
+    \item \textbf{Number of fake news retweets}
+    \item \textbf{Number of true news retweets}
+    \item \textbf{Total number of retweets}
+    \item \textbf{Average PageRank Centrality} across all trees where the user appears.
+    \item \textbf{Average Degree Centrality} across all trees where the user appears.
+    \item \textbf{Average Closeness Centrality} across all trees where the user appears.
+    \item \textbf{User Score}, calculated as follows:
+    
+\end{enumerate}
 
 \begin{center}
 	UserScore = US \\
 	Normalized number of false retweets = FR \\
 	Normalized true to false ratio = TFR \\
 	Normalized pagerank of node = NP \\
-	Normalized degree centrality of node = NP \\
-	Normalized closeness centrality of node = NP \\
+	Normalized degree centrality of node = DC \\
+	Normalized closeness centrality of node = CC \\
 \end{center}
 
 \begin{equation}
-	US = 0.4 \times FR + 0.3 \times TFR + 0.2 \times NP + 0.1 \times DC + 0.1 \times CC
+	US = 0.4 \times FR + 0.3 \times TFR + 0.1 \times NP + 0.1 \times DC + 0.1 \times CC
 \end{equation}
 
-\begin{lstlisting}[language=Python]
-	# Calculate the score for each user
-    # Calculate FR (False Retweets)
-    FR = user["FalseNews"] / user["TotalNews"] 
-        if user["TotalNews"] > 0 else 0
-    # Calculate TFR (True to False Ratio)
-    TFR = user["TrueNews"] / user["FalseNews"] 
-        if user["FalseNews"] > 0 else user["TrueNews"]
-    # Calculate NP (PageRank)
-    NP = (user["PageRankCentrality"] - min_pr) / (max_pr - min_pr) 
-        if max_pr != min_pr else 0
-    # Calculate DC (Degree Centrality)
-    DC = (user["DegreeCentrality"] - min_dc) / (max_dc - min_dc) 
-        if max_dc != min_dc else 0
-    # Calculate CC (Closeness Centrality)
-    CC = (user["ClosenessCentrality"] - min_cc) / (max_cc - min_cc) 
-        if max_cc != min_cc else 0
-    # Penalize users with low TotalNews
-    penalty = alpha / user["TotalNews"] if user["TotalNews"] > 0 else 0
-    # Calculate UserScore
-    user["UserScore"] = 0.4 * FR + 0.3 * TFR + 0.1 * NP + 0.1 * DC + 0.1 * CC
-\end{lstlisting}
+\subsection*{Feature Aggregation for News Trees}
+For each news tree in the dataset, we derived features based on the users who shared that news, utilizing the \textit{User Reliability Ranking} described above. These features include:
+\begin{itemize}
+    \item \textbf{Average User Score} of all users who shared the news.
+    \item \textbf{Percentage of reliable users} (users exceeding an experimentally determined User Score threshold).
+    \item \textbf{Minimum User Score} among users who shared the news.
+    \item \textbf{Maximum User Score} among users who shared the news.
+    \item \textbf{Average PageRank Centrality} of users who shared the news.
+    \item \textbf{Average Degree Centrality} of users who shared the news.
+    \item \textbf{Average Closeness Centrality} of users who shared the news.
+\end{itemize}
 
-This user ranking will be useful later to train some models in order to increase the general accuracy. As stated before we are going to implement three type of ML models: Support Vector Machine, Feed Forward Neural Network and Random Forest of which all have been tuned with a validation set to have the best parameters.
-The final question is: how well does these model perform on the features extracted before?
+\subsection*{Model Training and Testing}
+These user-related features were combined with the existing tree structure features to train the model. During the training phase, user-related features were computed exclusively using the training set.
+
+In the testing phase, we computed the user-related features for the test set using only the user information derived from the training set.
+
+\subsection*{Results}
+Incorporating the user-related features significantly improved the model's accuracy compared to the baseline model that used only tree structure features. Below are the results of the models trained with the "gossipcop" dataset.
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+Class & Precision & Recall & F1-Score & Support \\
+\hline
+0.0    & 0.88      & 0.85   & 0.86     & 580     \\
+1.0    & 0.83      & 0.87   & 0.85     & 513     \\
+\hline
+\textbf{Accuracy}   & \multicolumn{4}{c|}{0.86 (1093)} \\
+\hline
+Macro avg           & 0.86      & 0.86   & 0.86     & 1093    \\
+Weighted avg        & 0.86      & 0.86   & 0.86     & 1093    \\
+\hline
+\end{tabular}
+\caption{Random Forest without using User Reliability Ranking}
+\end{table}
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+Class & Precision & Recall & F1-Score & Support \\
+\hline
+0.0    & 0.85      & 0.86   & 0.85     & 561     \\
+1.0    & 0.85      & 0.84   & 0.84     & 532     \\
+\hline
+\textbf{Accuracy}   & \multicolumn{4}{c|}{0.85 (1093)} \\
+\hline
+Macro avg           & 0.85      & 0.85   & 0.85     & 1093    \\
+Weighted avg        & 0.85      & 0.85   & 0.85     & 1093    \\
+\hline
+\end{tabular}
+\caption{Feed Forward Neural Network without using User Reliability Ranking}
+\end{table}
+
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+Class & Precision & Recall & F1-Score & Support \\
+\hline
+0.0    & 0.84      & 0.80   & 0.82     & 547     \\
+1.0    & 0.81      & 0.85   & 0.83     & 547     \\
+\hline
+\textbf{Accuracy}   & \multicolumn{4}{c|}{0.82 (1094)} \\
+\hline
+Macro avg           & 0.83      & 0.82   & 0.82     & 1094    \\
+Weighted avg        & 0.83      & 0.82   & 0.82     & 1094    \\
+\hline
+\end{tabular}
+\caption{SVM Polynomial Kernel without using User Reliability Ranking}
+\end{table}
 
 \newpage
 
-\subsection*{Results}
-
-\begin{figure}[h]
-    \centering
-    \subfigure[Random Forest Results]{
-        \includegraphics[width=0.4\textwidth]{rf_results}
-    }
-    \subfigure[Feed Forward Neural Network Results]{
-        \includegraphics[width=0.4\textwidth]{ffnn_results}
-    }
-    \subfigure[Support Vector Machine Results]{
-        \includegraphics[width=0.4\textwidth]{svm_no_ranking_result}
-    }
-\end{figure}
-
 The Support Vector Machine results were promising even though the model is very simple, requires few resources and the training is not time consuming. We then tried to concatenate the User ranking data to the features of the news graph and feed them into another SVM model with the same parameters as the one used in figure (a). The results were impressive:
 
-\begin{figure}[h]
-    \centering
-    \subfigure[Support Vector Machine with ranking Results]{
-        \includegraphics[width=0.6\textwidth]{svm_ranking_result.png}
-    }
-\end{figure}
+\begin{table}[ht]
+\centering
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+Class & Precision & Recall & F1-Score & Support \\
+\hline
+0.0    & 0.96      & 0.88   & 0.92     & 547     \\
+1.0    & 0.89      & 0.96   & 0.92     & 547     \\
+\hline
+\textbf{Accuracy}   & \multicolumn{4}{c|}{0.92 (1094)} \\
+\hline
+Macro avg           & 0.92      & 0.92   & 0.92     & 1094    \\
+Weighted avg        & 0.92      & 0.92   & 0.92     & 1094    \\
+\hline
+\end{tabular}
+\caption{SVM Polynomial Kernel (C=10, degree=3), with data from User Reliability Ranking}
+\end{table}
+\subsection*{Challanges encountered}
+The most challenging part was extracting the data, as much of the information in the dataset—like user IDs and news labels—is spread across multiple files. Ensuring consistency while retrieving this data took significant effort. Initially, a mistake was made during the model training process: the User Ranking was calculated using the entire dataset, including the portion later designated as the test set. As a result, the test set already contained pre-extracted user information derived during the User Ranking calculation. This led to artificially inflated performance results, an indication of overfitting. To address this, we corrected the process by calculating the User Ranking solely on the training set while leaving the test set untouched. Due to the added complexity, we skipped k-fold cross-validation for models using the User Ranking, unlike those trained without it. Implementing this would have required recalculating the ranking dynamically for each fold, which was infeasible given time constraints. Instead, we reused hyperparameters from the models trained without the User Ranking. Future development could focus on integrating this functionality into the code.
+\subsection*{Conclusions}
+This study successfully demonstrated that fake news on Twitter can be identified using graph-based features without relying on user metadata. Key features such as tree depth, retweet breadth, and centrality metrics were extracted and used to train machine learning models, achieving high accuracy. The integration of a User Reliability Ranking further improved model performance, boosting precision, recall, and overall predictive accuracy to 92\% using an SVM with user data.
+\\These results show the effectiveness of using retweet graph structures for misinformation detection.
 
-\section*{Issues encountered}
+
+
+
+
+
 
 \newpage
 

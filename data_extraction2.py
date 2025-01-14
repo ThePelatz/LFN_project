@@ -1,3 +1,7 @@
+# GOAL OF THIS PROGRAM: 
+# Create a csv file (user_news_statistics_with_centrality.csv) which will save the feautures for each single user:
+# The features are: true_news, fake_news, total_news, pagerank, degree, closeness
+
 import csv
 import numpy as np
 import networkx as nx

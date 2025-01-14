@@ -1,0 +1,10 @@
+RF Classification Report:
+Best hyperparameters: {'max_depth': 10, 'min_samples_leaf': 2, 'min_samples_split': 2, 'n_estimators': 200}
+              precision    recall  f1-score   support
+
+         0.0       0.88      0.85      0.86       580
+         1.0       0.83      0.87      0.85       513
+
+    accuracy                           0.86      1093
+   macro avg       0.86      0.86      0.86      1093
+weighted avg       0.86      0.86      0.86      1093
