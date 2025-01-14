@@ -248,10 +248,7 @@ For each news tree in the dataset, we derived features based on the users who sh
     \item \textbf{Average Closeness Centrality} of users who shared the news.
 \end{itemize}
 
-\subsection*{Model Training and Testing}
-These user-related features were combined with the existing tree structure features to train the model. During the training phase, user-related features were computed exclusively using the training set.
-
-In the testing phase, we computed the user-related features for the test set using only the user information derived from the training set.
+These user-related features were combined with the existing tree structure features to train the model.
 
 \subsection*{Results}
 Incorporating the user-related features significantly improved the model's accuracy compared to the baseline model that used only tree structure features. Below are the results of the models trained with the "gossipcop" dataset.
