@@ -1,5 +1,8 @@
 import os
 
+if not os.path.exists("./out"):
+    os.makedirs("./out")
+
 if not os.path.isfile("./.config") or os.path.getsize("./.config") <= 0:
 	print("INFO: Empty '.config' file")
 	file_type = input("Which dataset would you like to analyse (gossipcop / politifact): ")
@@ -18,13 +21,35 @@ else:
 
 from dataset_loader import *
 
-#dataset, timestamps = load_dataset(file_type)
-#dump_data(analyse_dataset(dataset, timestamps), file_type)
+dataset, timestamps = load_dataset(file_type)
+dump_data(analyse_dataset(dataset, timestamps), file_type)
 
 from probalistic_pred import *
 
-#prob_predictor(file_type)
+prob_predictor(file_type)
 
 from data_extraction0 import *
 
 split_graph_dataset(file_type)
+
+from data_extraction1 import *
+
+user_mapping(file_type)
+
+from data_extraction2 import *
+
+user_news_stats(file_type)
+
+from data_extraction3 import *
+
+user_ranking(file_type)
+
+from data_extraction4 import *
+
+create_ranking_metrics(file_type, True)
+create_ranking_metrics(file_type, False)
+
+from data_extraction5 import *
+
+create_final_dataset(file_type, True)
+create_final_dataset(file_type, False)

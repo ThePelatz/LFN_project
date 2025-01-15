@@ -6,13 +6,20 @@
 import pandas as pd
 import networkx as nx
 import pickle
+import os
 
 # Reading files
-file_type = "gossipcop"
-ranking_file = f"./{file_type}/USER_RANKING.csv"
-mapping_file = f"./{file_type}/{file_type[:3]}_id_twitter_mapping.pkl"
 
-def create_ranking_metrics(graph_file, output_file):
+def create_ranking_metrics(file_type, train=True):
+    ranking_file = f"./out/{file_type}_USER_RANKING.csv"
+    mapping_file = f"./{file_type}/{file_type[:3]}_id_twitter_mapping.pkl"
+    
+    if train:
+        graph_file = f"./out/{file_type}_train.txt"
+        output_file = f"./out/{file_type}_ranking_metrics.csv"
+    else:
+        graph_file = f"./out/{file_type}_test.txt"
+        output_file = f"./out/{file_type}_ranking_metrics_test.csv"
 
     # Load the user ranking file
     user_ranking = pd.read_csv(ranking_file)
@@ -85,13 +92,29 @@ def create_ranking_metrics(graph_file, output_file):
     # Save the results to a CSV file
     pd.DataFrame(results).to_csv(output_file, index=False, header=True)
 
-    print(f"Metrics saved to {output_file}")
+    if train:
+        print(f"INFO: Train metrics correctly saved for '{file_type}'")
+    else:
+        print(f"INFO: Test metrics correctly saved for '{file_type}'")
 
-# Define file paths and run the function for training and test data
-graph_file = f"./{file_type}/A_train.txt"
-output_file = f"./{file_type}/ranking_metrics.csv"
-create_ranking_metrics(graph_file, output_file)
-
-graph_file = f"./{file_type}/A_test.txt"
-output_file = f"./{file_type}/ranking_metrics_test.csv"
-create_ranking_metrics(graph_file, output_file)
+if __name__ == "__main__":
+    if not os.path.exists("./out"):
+        os.makedirs("./out")
+        
+    if not os.path.isfile("./.config") or os.path.getsize("./.config") <= 0:
+        print("INFO: Empty '.config' file")
+        file_type = input("Which dataset would you like to analyse (gossipcop / politifact): ")
+        if file_type != "gossipcop" and file_type != "politifact":
+            print("ERROR: Incorrect input")
+            exit(1)
+        with open("./.config", "w") as f:
+            f.write(file_type)
+    else:
+        with open("./.config", "r") as f:
+            file_type = f.read()
+        if file_type != "gossipcop" and file_type != "politifact":
+            print("ERROR: Incorrect syntax of file '.config'")
+            exit(1)
+    
+    create_ranking_metrics(file_type, True)
+    create_ranking_metrics(file_type, False)

@@ -3,12 +3,30 @@ from sklearn.model_selection import train_test_split
 from sklearn import preprocessing
 from sklearn.svm import SVC
 from sklearn.model_selection import GridSearchCV
-from sklearn.metrics import accuracy_score, classification_report
+from sklearn.metrics import classification_report
+import os
 
-file_type = "gossipcop"
+if not os.path.exists("./out"):
+    os.makedirs("./out")
+
+if not os.path.isfile("./.config") or os.path.getsize("./.config") <= 0:
+	print("INFO: Empty '.config' file")
+	file_type = input("Which dataset would you like to analyse (gossipcop / politifact): ")
+	if file_type != "gossipcop" and file_type != "politifact":
+		print("ERROR: Incorrect input")
+		exit(1)
+	with open("./.config", "w") as f:
+		f.write(file_type)
+else:
+	with open("./.config", "r") as f:
+		file_type = f.read()
+	if file_type != "gossipcop" and file_type != "politifact":
+		print("ERROR: Incorrect syntax of file '.config'")
+		exit(1)
+        
 
 # Load the data
-df = pd.read_csv(f"{file_type}.csv", sep=',', header=None)
+df = pd.read_csv(f"./out/{file_type}.csv", sep=',', header=None)
 Data = df.values
 m = Data.shape[0]
 Y = Data[:, -1]  # Last column contains labels
@@ -35,7 +53,7 @@ Xval_scaled = scaler.transform(Xval)
 # Linear SVM
 print("\nLinear SVM")
 model_svm = SVC(kernel="linear")
-hyper_params = {"C": [0.1, 1, 10, 100, 1000]}
+hyper_params = {"C": [1, 10, 100]}
 GS = GridSearchCV(estimator=model_svm, param_grid=hyper_params, cv=5)
 GS.fit(Xtrain_scaled, Ytrain)
 print("Best value for hyperparameters: ", GS.best_params_)
@@ -49,7 +67,7 @@ print("Training score: ", training_score_linear)
 print("\nPoly SVM")
 model_svm = SVC(kernel="poly")
 hyper_params = {
-    "C": [0.1, 1, 10, 100, 1000],
+    "C": [1, 10, 100],
     "degree": [2, 3, 4]
 }
 GS = GridSearchCV(estimator=model_svm, param_grid=hyper_params, cv=5)
@@ -65,7 +83,7 @@ print("Training score: ", training_score_poly)
 print("\nRBF SVM")
 model_svm = SVC(kernel="rbf")
 hyper_params = {
-    "C": [0.1, 1, 10, 100, 1000],
+    "C": [1, 10, 100],
     "gamma": [0.01]
 }
 GS = GridSearchCV(estimator=model_svm, param_grid=hyper_params, cv=5)
@@ -81,7 +99,7 @@ print("Training score: ", training_score_rbf)
 print("\nSigmoid SVM")
 model_svm = SVC(kernel="sigmoid")
 hyper_params = {
-    "C": [0.1, 1, 10, 100, 1000],
+    "C": [1, 10, 100],
     "gamma": [0.01],
     "coef0": [0, 1]
 }
@@ -145,7 +163,7 @@ y_pred = best_model.predict(Xtest_scaled)
 print("\nClassification Report:")
 report = classification_report(Ytest, y_pred)
 print(report)
-with open(f'./report/svm_{file_type}_report.txt', 'w') as f:
+with open(f'./out/svm_{file_type}_report.txt', 'w') as f:
     f.write("SVM Classification Report:\n")
     f.write(f"Best kernel: {best_kernel}\n")
     f.write(report)

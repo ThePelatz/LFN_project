@@ -122,6 +122,8 @@ def split_graph_dataset(file_type, split_ratio=0.8):
 
 
 if __name__ == "__main__":
+    if not os.path.exists("./out"):
+        os.makedirs("./out")
     if not os.path.isfile("./.config") or os.path.getsize("./.config") <= 0:
         print("INFO: Empty '.config' file")
         file_type = input("Which dataset would you like to analyse (gossipcop / politifact): ")

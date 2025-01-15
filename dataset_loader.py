@@ -2,6 +2,8 @@ import numpy as np
 import pprint as pp
 import networkx as nx
 import pickle
+from subgraph import *
+import os
 
 def dump_data(data, file_type: str):
     file_name = f"./out/{file_type}.csv"
@@ -54,7 +56,7 @@ def analyse_dataset(subgraphs: list, maps_timestamps):
     pagerank_f = 0
 
     for s in subgraphs:
-        print(f"\rAnalyzing graph: {str(i+j)}")
+        print(f"\rAnalyzing graph: {str(i+j)}/{len(subgraphs)}", end="")
         #calculating the std of timestamps
         timestamps = []
         for node in s.graph.nodes:
@@ -93,7 +95,7 @@ def analyse_dataset(subgraphs: list, maps_timestamps):
             pagerank_f += pr
             j += 1
 
-    print("Average diameter of real graphs: " + str(total_r / i))
+    print("\nAverage diameter of real graphs: " + str(total_r / i))
     print("Average diameter of fake graphs: " + str(total_f / j))
 
     print()
@@ -126,11 +128,22 @@ def analyse_dataset(subgraphs: list, maps_timestamps):
 
 
 if __name__ == "__main__":
-    file_type = input("Which dataset would you like to analyse (gossipcop / politifact): ")
-
-    if file_type != "gossipcop" and file_type != "politifact":
-        print("ERROR: Incorrect input")
-        exit(1)
+    if not os.path.exists("./out"):
+        os.makedirs("./out")
+    if not os.path.isfile("./.config") or os.path.getsize("./.config") <= 0:
+        print("INFO: Empty '.config' file")
+        file_type = input("Which dataset would you like to analyse (gossipcop / politifact): ")
+        if file_type != "gossipcop" and file_type != "politifact":
+            print("ERROR: Incorrect input")
+            exit(1)
+        with open("./.config", "w") as f:
+            f.write(file_type)
+    else:
+        with open("./.config", "r") as f:
+            file_type = f.read()
+        if file_type != "gossipcop" and file_type != "politifact":
+            print("ERROR: Incorrect syntax of file '.config'")
+            exit(1)
     
     dataset, timestamps = load_dataset(file_type)
     dump_data(analyse_dataset(dataset, timestamps), file_type)

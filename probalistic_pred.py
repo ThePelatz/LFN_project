@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import os
 
 
 def confidence_scoring(value, avg_r, avg_f):
@@ -146,10 +147,21 @@ def prob_predictor(file_type: str):
     plt.show()
     
 if __name__ == "__main__":
-    file_type = input("Which dataset would you like to analyse (gossipcop / politifact): ")
-
-    if file_type != "gossipcop" and file_type != "politifact":
-        print("ERROR: Incorrect input")
-        exit(1)
+    if not os.path.exists("./out"):
+        os.makedirs("./out")
+    if not os.path.isfile("./.config") or os.path.getsize("./.config") <= 0:
+        print("INFO: Empty '.config' file")
+        file_type = input("Which dataset would you like to analyse (gossipcop / politifact): ")
+        if file_type != "gossipcop" and file_type != "politifact":
+            print("ERROR: Incorrect input")
+            exit(1)
+        with open("./.config", "w") as f:
+            f.write(file_type)
+    else:
+        with open("./.config", "r") as f:
+            file_type = f.read()
+        if file_type != "gossipcop" and file_type != "politifact":
+            print("ERROR: Incorrect syntax of file '.config'")
+            exit(1)
     
     prob_predictor(file_type)

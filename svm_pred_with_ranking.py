@@ -1,16 +1,34 @@
 import pandas as pd
 from sklearn import preprocessing
 from sklearn.svm import SVC
-from sklearn.metrics import accuracy_score, classification_report
+from sklearn.metrics import classification_report
+import os
 
-file_type = "gossipcop"
+if not os.path.exists("./out"):
+    os.makedirs("./out")
+
+if not os.path.isfile("./.config") or os.path.getsize("./.config") <= 0:
+	print("INFO: Empty '.config' file")
+	file_type = input("Which dataset would you like to analyse (gossipcop / politifact): ")
+	if file_type != "gossipcop" and file_type != "politifact":
+		print("ERROR: Incorrect input")
+		exit(1)
+	with open("./.config", "w") as f:
+		f.write(file_type)
+else:
+	with open("./.config", "r") as f:
+		file_type = f.read()
+	if file_type != "gossipcop" and file_type != "politifact":
+		print("ERROR: Incorrect syntax of file '.config'")
+		exit(1)
+        
 
 # Load training dataset
-train_main = pd.read_csv(f"./{file_type}/{file_type}_resized.csv", sep=',', header=None)
+train_main = pd.read_csv(f"./out/{file_type}_resized.csv", sep=',', header=None)
 
 # Load additional training data, skipping the first column (non-numeric ID)
 train_additional = pd.read_csv(
-    f"./{file_type}/ranking_metrics.csv", 
+    f"./out/{file_type}_ranking_metrics.csv", 
     sep=',', 
     header=0, 
     usecols=range(1, 8)  # Skip the first column, keep the rest
@@ -26,11 +44,11 @@ if len(train_main) != len(train_additional):
 train_combined = pd.concat([train_additional, train_main], axis=1)
 
 # Load testing dataset
-test_main = pd.read_csv(f"./{file_type}/{file_type}_resized_test.csv", sep=',', header=None)
+test_main = pd.read_csv(f"./out/{file_type}_resized_test.csv", sep=',', header=None)
 
 # Load additional testing data, skipping the first column (non-numeric ID)
 test_additional = pd.read_csv(
-    f"./{file_type}/ranking_metrics_test.csv", 
+    f"./out/{file_type}_ranking_metrics_test.csv", 
     sep=',', 
     header=0, 
     usecols=range(1, 8)  # Skip the first column, keep the rest
@@ -83,7 +101,7 @@ report = classification_report(Ytest, y_pred)
 print(report)
 
 # Save the classification report to a file
-with open(f'./report/svm_{file_type}_report_with_ranking.txt', 'w') as f:
+with open(f'./out/svm_{file_type}_report_with_ranking.txt', 'w') as f:
     f.write("SVM Classification Report with Ranking Data:\n")
     f.write(f"Kernel: Polynomial (C=10, degree=3)\n")
     f.write(report)

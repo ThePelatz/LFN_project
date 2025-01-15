@@ -1,18 +1,35 @@
 import pandas as pd
 from sklearn import preprocessing
 from sklearn.svm import SVC
-from sklearn.metrics import accuracy_score, classification_report
+from sklearn.metrics import classification_report
+import os
 
-file_type = "gossipcop"
+if not os.path.exists("./out"):
+    os.makedirs("./out")
+
+if not os.path.isfile("./.config") or os.path.getsize("./.config") <= 0:
+	print("INFO: Empty '.config' file")
+	file_type = input("Which dataset would you like to analyse (gossipcop / politifact): ")
+	if file_type != "gossipcop" and file_type != "politifact":
+		print("ERROR: Incorrect input")
+		exit(1)
+	with open("./.config", "w") as f:
+		f.write(file_type)
+else:
+	with open("./.config", "r") as f:
+		file_type = f.read()
+	if file_type != "gossipcop" and file_type != "politifact":
+		print("ERROR: Incorrect syntax of file '.config'")
+		exit(1)
 
 # Load training dataset (only the main data, no additional data)
-train_main = pd.read_csv(f"./{file_type}/{file_type}_resized.csv", sep=',', header=None)
+train_main = pd.read_csv(f"./out/{file_type}_resized.csv", sep=',', header=None)
 
 # Ensure the training file is loaded correctly
 print(f"Training data size: {len(train_main)}")
 
 # Load testing dataset (only the main data, no additional data)
-test_main = pd.read_csv(f"./{file_type}/{file_type}_resized_test.csv", sep=',', header=None)
+test_main = pd.read_csv(f"./out/{file_type}_resized_test.csv", sep=',', header=None)
 
 # Ensure the testing file is loaded correctly
 print(f"Testing data size: {len(test_main)}")
@@ -55,7 +72,7 @@ report = classification_report(Ytest, y_pred)
 print(report)
 
 # Save the classification report to a file
-with open(f'./report/svm_{file_type}_report_without_ranking.txt', 'w') as f:
+with open(f'./out/svm_{file_type}_report_without_ranking.txt', 'w') as f:
     f.write("SVM Classification Report without Ranking Data:\n")
     f.write(f"Kernel: Polynomial (C=10, degree=3)\n")
     f.write(report)

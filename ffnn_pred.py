@@ -7,11 +7,28 @@ from tensorflow.keras.layers import Dense, Dropout
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.callbacks import EarlyStopping
 from sklearn.metrics import classification_report
+import os
 
-file_type = "gossipcop"
+if not os.path.exists("./out"):
+    os.makedirs("./out")
+
+if not os.path.isfile("./.config") or os.path.getsize("./.config") <= 0:
+	print("INFO: Empty '.config' file")
+	file_type = input("Which dataset would you like to analyse (gossipcop / politifact): ")
+	if file_type != "gossipcop" and file_type != "politifact":
+		print("ERROR: Incorrect input")
+		exit(1)
+	with open("./.config", "w") as f:
+		f.write(file_type)
+else:
+	with open("./.config", "r") as f:
+		file_type = f.read()
+	if file_type != "gossipcop" and file_type != "politifact":
+		print("ERROR: Incorrect syntax of file '.config'")
+		exit(1)
 
 # Load the data
-df = pd.read_csv(f"{file_type}.csv", sep=',', header=None)
+df = pd.read_csv(f"./out/{file_type}.csv", sep=',', header=None)
 Data = df.values
 m = Data.shape[0]
 Y = Data[:, -1]  # Last column contains labels
@@ -118,7 +135,7 @@ y_pred = np.argmax(final_model.predict(Xtest_scaled), axis=-1)
 print("\nClassification Report:")
 report = classification_report(Ytest, y_pred)
 print(report)
-with open(f'./report/ffnn_{file_type}_report.txt', 'w') as f:
+with open(f'./out/ffnn_{file_type}_report.txt', 'w') as f:
     f.write("FFNN Classification Report:\n")
     f.write(f"Best hyperparameters: {best_params}\n")
     f.write(report)
