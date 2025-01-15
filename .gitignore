@@ -18,4 +18,7 @@ __pycache__
 *.dvi
 *.gz
 
+out/*
+report/*.txt
+
 classification_report_plot.py

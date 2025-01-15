@@ -131,6 +131,8 @@ We will make comparisons to better understand which model fits this problem best
 	\item AMD Ryzen 5 4500 (8-cores), Radeon RX 6600, 16GB DDR4, Windows 11 or Ubuntu 20.04
 \end{itemize}
 
+Note: For FFNN models in tensorflow, having a NVIDIA GPU with CUDA libraries is best practice due to better optimization of the training process. Although it is not strictly necessary.
+
 \section*{Development}
 
 \subsection*{Extracting informations from the dataset}
@@ -165,46 +167,35 @@ Using networkx\cite{networkx} as the library for analyzing the graphs, extractin
 
 
 \subsection*{\\Prediction system}
-Once the features are extracted we have created a system based on score that is capable of predicting in a probabilistic way if a news is real or fake. This system gets some graphs data as input
-and determines how much it deviates from the averages calculated with previous algorithms giving a final score from 0 to 12 (12 being the highest confidence).
 
-\begin{lstlisting}[language=Python]
-	def confidence_scoring(value, avg_r, avg_f):
-        # Compute the difference
-        diff_r = abs(avg_r - value)    #avg of real sub-graph - new value
-        diff_f = abs(avg_f - value)    #avg of fake sub-graph - new value
-        inside = (value<avg_r and value>avg_f) or (value<avg_f and value>avg_r) #The value is between the 2 avg
-        #Closest one
-        closer = 0              # 0 = Equal
-        if diff_r < diff_f:
-            closer = 1          # 1 = Real
-        elif diff_r > diff_f:
-            closer = 2          # 2 = Fake
-        #Confidence score
-        score = 0                                       #No guess
-        if closer == 1:                                 #Real
-            if 2*diff_r < diff_f or not inside:
-                score = 2                               #Strong guess
-            else:
-                score = 1                               #Weak guess
-        elif closer == 2:                               #Fake
-            if 2*diff_f < diff_r or not inside:
-                score = -2                              #Strong guess
-            else:
-                score = -1                              #Weak guess
-        return score
-\end{lstlisting}
+Once the features are extracted, we have created a system based on a confidence score that is
+capable of predicting in a probabilistic way if a news is real or fake. This system gets some
+graphs data as input and determines if his features are closer to the averages of the features of
+the real news, or fake news.
+For each feature, we give a score between 2 (similar to a real news) and -2 (similar to a fake
+news). The graph under show how the score is calculated as follows: the sign represents
+whether we are close to true (+) or false (-) news, and the number indicates confidence.
 
 \begin{center}
-	\includegraphics[width=0.8\textwidth]{graph}
+    \includegraphics[width=0.8\textwidth]{predictor_score_graph}
 \end{center}
 
-The image above is just an example on how it can display the prediction and its accuracy. It represent
-a conﬁdence score on how sure we are about a news label. From what we can see, there is a correlation between the data extracted from
-the graphs and their actual label. This is what we expected from the beginning so this will be important to develop a machine learning model which is able to predict the truthfulness of a news with a sufficiently high accuracy.
+By summing the scores of our 6 features, the total score is between -12 and 12. The sign will give
+us the prediction, positive mean real news and negative the opposite. The confidence score is
+the absolute value of the total score. With this method, we got the following results:
+
+\begin{center}
+    \includegraphics[width=0.8\textwidth]{predictor_results}
+\end{center}
+
+The image above is just an example on how it can display the prediction and its accuracy. It
+represent a confidence score on how sure we are about a news label. From what we can see,
+there is a correlation between the data extracted from the graphs and their actual label. This is
+what we expected from the beginning so this will be important to develop a machine learning
+model which is able to predict the truthfulness of a news with a sufficiently high accuracy.
 
 \subsection*{\\ \\User reliability ranking}
-To enhance the prediction accuracy for our news dataset, we extended our feature set by incorporating user-related information in addition to the tree structure representing the news. Specifically, we developed a \textit{User Reliability Ranking} system, which captures key characteristics of users who shared the news.
+To enhance the prediction accuracy for our news dataset, we extended our feature set by incorporating user-related information in addition to the tree structure representing the news. Specifically, we developed a \textit{User Reliability Ranking} system, which captures key characteristics of users who shared the news. Keep in mind that those informations about the users have nothing to do with their metadata as this would go against the hypothesis of this project.
 
 \subsection*{Methodology}
 
@@ -310,7 +301,7 @@ Weighted avg        & 0.83      & 0.82   & 0.82     & 1094    \\
 
 \newpage
 
-The Support Vector Machine results were promising even though the model is very simple, requires few resources and the training is not time consuming. We then tried to concatenate the User ranking data to the features of the news graph and feed them into another SVM model with the same parameters as the one used in figure (a). The results were impressive:
+The Support Vector Machine results were promising even though the model is very simple, requires few resources and the training is not time consuming. We then tried to concatenate the User ranking data to the features of the news graph and feed them into another SVM model with the same parameters as the one used in Table 3. The results were impressive:
 
 \begin{table}[ht]
 \centering

@@ -6,16 +6,11 @@ import numpy as np
 import networkx as nx
 import pickle
 import csv
+from subgraph import *
 
 file_type = 'gossipcop'
 
-class SubGraph:
-    def __init__(self, graph: nx.Graph, info: int):
-        self.graph = graph
-        self.info = info
-
 G = nx.Graph()
-
 
 with open(f"./{file_type}/A_train.txt") as f:
     for line in f:
@@ -23,7 +18,7 @@ with open(f"./{file_type}/A_train.txt") as f:
         G.add_edge(int(line[0]), int(line[1]))
 
 
-graphs_labels = np.load(f"./{file_type}/graph_labels_train.npy")
+graphs_labels = np.load(f"./out/{file_type}_graph_labels_train.npy")
 
 
 with open(f"./{file_type}/{file_type[:3]}_id_twitter_mapping.pkl", "rb") as f:

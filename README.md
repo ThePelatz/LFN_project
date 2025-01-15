@@ -6,6 +6,16 @@ Brocheton Damien 2133034, Martinez Zoren 2123873, Baggio Davide 2122547
 
 ## Instructions for Execution
 
+### 1. Install required libraries
+
+```bash
+  pip install -r requirements.txt
+```
+or manually install the libraries that are needed
+```bash
+  pip install matplotlib networkx numpy pandas scikit_learn tensorflow
+```
+
 ### 1. Obtain Metrics with Graph-Based Features
 To run the models using only graph-based features, use the following scripts:
 
