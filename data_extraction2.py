@@ -17,6 +17,10 @@ def user_news_stats(file_type: str):
     graph_labels_file = f"./out/{file_type}_graph_labels_train.npy"
     news_list_file = f"./out/{file_type}_news_list_train.txt"
     output_file = f"./out/{file_type}_user_news_statistics_with_centrality.csv"
+    
+    if os.path.isfile(output_file) and os.path.getsize(output_file) > 0:
+        print(f"INFO: User and news statistics for '{file_type}' already calculated")
+        return
 
     # Load ID mapping (local to real ID)
     with open(id_mapping_file, 'rb') as f:
