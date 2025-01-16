@@ -67,8 +67,8 @@ print("Training score: ", training_score_linear)
 print("\nPoly SVM")
 model_svm = SVC(kernel="poly")
 hyper_params = {
-    "C": [1, 10, 100],
-    "degree": [2, 3, 4]
+    "C": [0.1, 1, 10],
+    "degree": [3]
 }
 GS = GridSearchCV(estimator=model_svm, param_grid=hyper_params, cv=5)
 GS.fit(Xtrain_scaled, Ytrain)

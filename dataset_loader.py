@@ -17,6 +17,10 @@ def dump_data(data, file_type: str):
             file.write(s)
 
 def load_dataset(file_type: str):
+    if os.path.isfile(f"./out/{file_type}.csv") and os.path.getsize(f"./out/{file_type}.csv") > 0:
+        print(f"INFO: dataset for '{file_type}' already loaded")
+        return
+    
     with open(f"./{file_type}/{file_type[:3]}_id_time_mapping.pkl", 'rb') as f:
         maps_timestamps = pickle.load(f)
     
@@ -34,7 +38,7 @@ def load_dataset(file_type: str):
         subgraphs.append(SubGraph(G.subgraph(cc), int(graphs_labels[index])))
         #print(cc)
         
-    return subgraphs, maps_timestamps
+    analyse_dataset(subgraphs, maps_timestamps)
 
 
 def analyse_dataset(subgraphs: list, maps_timestamps):
@@ -123,7 +127,7 @@ def analyse_dataset(subgraphs: list, maps_timestamps):
     print("Average pagerank of real graphs: " + str(pagerank_r / i))
     print("Average pagerank of fake graphs: " + str(pagerank_f / j))
 
-    return all_data
+    dump_data(all_data, file_type)
 
 
 
@@ -145,5 +149,4 @@ if __name__ == "__main__":
             print("ERROR: Incorrect syntax of file '.config'")
             exit(1)
     
-    dataset, timestamps = load_dataset(file_type)
-    dump_data(analyse_dataset(dataset, timestamps), file_type)
+    load_dataset(file_type)

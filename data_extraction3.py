@@ -9,6 +9,10 @@ import os
 def user_ranking(file_type: str):
     input_file = f"./out/{file_type}_user_news_statistics_with_centrality.csv"
     output_file = f"./out/{file_type}_USER_RANKING.csv"
+    
+    if os.path.isfile(output_file) and os.path.getsize(output_file) > 0:
+        print(f"INFO: dataset for '{file_type}' already loaded")
+        return
 
     alpha = 0.2  # Penalization factor for low total tweets
     single_news_true_score = 1.0  # Score for users with a single true news

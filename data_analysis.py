@@ -21,12 +21,7 @@ else:
 
 from dataset_loader import *
 
-dataset, timestamps = load_dataset(file_type)
-dump_data(analyse_dataset(dataset, timestamps), file_type)
-
-from probalistic_pred import *
-
-prob_predictor(file_type)
+load_dataset(file_type)
 
 from data_extraction0 import *
 
@@ -53,3 +48,8 @@ from data_extraction5 import *
 
 create_final_dataset(file_type, True)
 create_final_dataset(file_type, False)
+
+from probalistic_pred import *
+
+print("\nINFO: Running the probabilistic Predictor\n")
+prob_predictor(file_type)
