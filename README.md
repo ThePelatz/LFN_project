@@ -56,11 +56,7 @@ If you want to have more control over the code base instead of running the **dat
 
 #### 3.3 ML models
 
-<<<<<<< HEAD
 ##### Models using only graph-based features
-=======
-To run the ML models on the retrieved data, simply run these commands:
->>>>>>> 5a4d243a9a5cb7deba25799cc19ba31479e74b77
 
 - **Feed Forward Neural Networks (FFNN)**: 
   ```bash
@@ -77,17 +73,9 @@ To run the ML models on the retrieved data, simply run these commands:
   python3 svm_pred_without_ranking.py 
   ```
 
-<<<<<<< HEAD
 ##### Models using aggregated features with "User Reliability Ranking" data
 
 - **Support Vector Machine (SVM) with ranking**: 
   ```bash
   python3 svm_pred_with_ranking.py 
   ```
-=======
-  ```bash
-  python3 svm_pred_with_ranking.py 
-  ```
-
-
->>>>>>> 5a4d243a9a5cb7deba25799cc19ba31479e74b77
