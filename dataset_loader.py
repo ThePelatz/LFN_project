@@ -38,10 +38,10 @@ def load_dataset(file_type: str):
         subgraphs.append(SubGraph(G.subgraph(cc), int(graphs_labels[index])))
         #print(cc)
         
-    analyse_dataset(subgraphs, maps_timestamps)
+    analyse_dataset(subgraphs, maps_timestamps, file_type)
 
 
-def analyse_dataset(subgraphs: list, maps_timestamps):
+def analyse_dataset(subgraphs: list, maps_timestamps, file_type):
     all_data = []
     i = 0
     total_r = 0
