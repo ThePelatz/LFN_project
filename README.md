@@ -2,7 +2,7 @@
 # Predicting news truthfulness through graph-based retweet patterns
 Brocheton Damien 2133034, Martinez Zoren 2123873, Baggio Davide 2122547
 
-[Full Project Report](https://github.com/davidebaggio/LFN_proj/blob/master/report/final_report.pdf)  
+[Full Project Report](https://github.com/ThePelatz/LFN_project/blob/master/report/final_report.pdf)  
 
 ### 1. Install required libraries
 
